@@ -12,7 +12,6 @@ require('dotenv').config();
 const WEB_PORT = process.env.WEB_PORT || 8080;
 
 const HOST = 'nia.app.appmd.co.kr';
-const HTTP_PORT = 3031;
 const HTTPS_PORT = 3030;
 
 const app = websockify(new Koa());
@@ -57,8 +56,6 @@ app.ws.use(async (ctx, next) => {
 // })
 
 // Listen
-const httpServer = http.createServer(app.callback())
-  .listen(HTTP_PORT, HOST, listeningReporter)
 const httpsServer = https.createServer(app.callback())
   .listen(HTTPS_PORT, HOST, listeningReporter)
 // A function that runs in the context of the http server
