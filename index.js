@@ -3,9 +3,17 @@ const serve       = require('koa-static');
 const websockify  = require('koa-websocket');
 const cors        = require('kcors');
 const UUID        = require('uuid/v4');
+// var fs = require('fs');
+// var path = require('path');
+var http = require('http');
+var https = require('https');
 require('dotenv').config();
 
 const WEB_PORT = process.env.WEB_PORT || 8080;
+
+const HOST = 'nia.app.appmd.co.kr';
+const HTTP_PORT = 3031;
+const HTTPS_PORT = 3030;
 
 const app = websockify(new Koa());
 
@@ -44,6 +52,20 @@ app.ws.use(async (ctx, next) => {
     }
 });
 
-app.listen(WEB_PORT, () => {
-    console.info(`Server listening on port ${WEB_PORT}`); 
-})
+// app.listen(WEB_PORT, () => {
+//     console.info(`Server listening on port ${WEB_PORT}`); 
+// })
+
+// Listen
+const httpServer = http.createServer(app.callback())
+  .listen(HTTP_PORT, HOST, listeningReporter)
+const httpsServer = https.createServer(app.callback())
+  .listen(HTTPS_PORT, HOST, listeningReporter)
+// A function that runs in the context of the http server
+// and reports what type of server listens on which port
+function listeningReporter () {
+  // `this` refers to the http server here
+  const { address, port } = this.address();
+  const protocol = this.addContext ? 'https' : 'http';
+  console.log(`Listening on ${protocol}://${address}:${port}...`);
+}
