@@ -11,9 +11,6 @@ require('dotenv').config();
 
 const WEB_PORT = process.env.WEB_PORT || 8080;
 
-const HOST = 'nia.app.appmd.co.kr';
-const HTTPS_PORT = 3030;
-
 const app = websockify(new Koa());
 
 app.use(cors({
@@ -51,18 +48,6 @@ app.ws.use(async (ctx, next) => {
     }
 });
 
-// app.listen(WEB_PORT, () => {
-//     console.info(`Server listening on port ${WEB_PORT}`); 
-// })
-
-// Listen
-const httpsServer = https.createServer(app.callback())
-  .listen(HTTPS_PORT, HOST, listeningReporter)
-// A function that runs in the context of the http server
-// and reports what type of server listens on which port
-function listeningReporter () {
-  // `this` refers to the http server here
-  const { address, port } = this.address();
-  const protocol = this.addContext ? 'https' : 'http';
-  console.log(`Listening on ${protocol}://${address}:${port}...`);
-}
+app.listen(WEB_PORT, () => {
+    console.info(`Server listening on port ${WEB_PORT}`); 
+})
