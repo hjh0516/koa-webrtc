@@ -1,62 +1,92 @@
-const Koa         = require('koa');
-const serve       = require('koa-static');
-const websockify  = require('koa-websocket');
-const cors        = require('kcors');
-const UUID        = require('uuid/v4');
-var fs = require('fs');
-// var path = require('path');
-// var http = require('http');
-var https = require('https');
-require('dotenv').config();
+'use strict';
 
-const WEB_PORT = process.env.WEB_PORT || 8080;
+var os = require('os');
+var nodeStatic = require('node-static');
+//var http = require('http');
+var socketIO = require('socket.io');
 
-const app = websockify(new Koa());
-
-app.use(cors({
-    origin: '*'
-}));
-
-app.use(serve('./public'));
-
-const connections = new Map();
-
-app.ws.use(async (ctx, next) => {
-    const uuid = UUID();
-    connections.set(uuid, ctx.websocket);
-
-    ctx.websocket.on('close', () => {
-        connections.delete(uuid);
-    });
-
-    ctx.websocket.on('message', (data) => {
-        const message = JSON.parse(data);
-        switch(message.type){
-            case 'offer':
-            case 'answer':
-            case 'candidate':
-                connections.get(message.to) && connections.get(message.to).send(JSON.stringify(Object.assign(message, { from: uuid })));
-                break;
-        }
-    });
-
-    ctx.websocket.send(JSON.stringify({ type: 'welcome', uuid }));
-
-    //tell all exsiting connections about this new connection
-    for(let [id, connection] of connections){
-        id !== uuid && connection.send(JSON.stringify({ type: 'join', from: uuid }));
-    }
-});
-
-
+const https = require('https');
+const fs = require('fs');
 
 const options = {
-   key: fs.readFileSync("key.pem"),
-   cert: fs.readFileSync("cert.pem")
- };
+  key: fs.readFileSync('./private.pem'),
+  cert: fs.readFileSync('./public.pem')
+};
 
- https.createServer(options, app.callback()).listen(WEB_PORT);
+var fileServer = new(nodeStatic.Server)();
+let app = https.createServer(options, (req,res)=>{
+  fileServer.serve(req, res);
+}).listen(3030);
 
-// app.listen(WEB_PORT, () => {
-//     console.info(`Server listening on port ${WEB_PORT}`); 
-// })
+console.log('Started chating server...');
+
+var io = socketIO.listen(app);
+io.sockets.on('connection', function(socket) {
+
+  // convenience function to log server messages on the client
+  function log() {
+    var array = ['Message from server:'];
+    array.push.apply(array, arguments);
+    socket.emit('log', array);
+  }
+
+  socket.on('message', function(message) {
+    log('Client said: ', message);
+	
+	if (message==="bye" && socket.rooms['foo']) {
+		io.of('/').in('foo').clients((error, socketIds) => {
+		if (error) throw error;
+
+		socketIds.forEach(socketId => {
+		//	if (socket.id===socketId) console.log('-------------------************');
+//			else socket.broadcast.emit('message', message);
+			io.sockets.sockets[socketId].leave('foo');
+		});
+
+		});
+	} //else {
+		// for a real app, would be room-only (not broadcast)
+		socket.broadcast.emit('message', message);
+		
+  });
+
+  socket.on('create or join', function(room) {
+    log('Received request to create or join room ' + room);
+
+    var clientsInRoom = io.sockets.adapter.rooms[room];
+    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+    log('Room ' + room + ' now has ' + numClients + ' client(s)');
+
+    if (numClients === 0) {
+      socket.join(room);
+      log('Client ID ' + socket.id + ' created room ' + room);
+      socket.emit('created', room, socket.id);
+	  console.log('created');
+    } else if (numClients === 1) {
+      log('Client ID ' + socket.id + ' joined room ' + room);
+      io.sockets.in(room).emit('join', room);
+      socket.join(room);
+      socket.emit('joined', room, socket.id);
+      io.sockets.in(room).emit('ready');
+	  console.log('joined');
+    } else { // max two clients
+      socket.emit('full', room);
+    }
+  });
+
+  socket.on('ipaddr', function() {
+    var ifaces = os.networkInterfaces();
+    for (var dev in ifaces) {
+      ifaces[dev].forEach(function(details) {
+        if (details.family === 'IPv4' && details.address !== '127.0.0.1') {
+          socket.emit('ipaddr', details.address);
+        }
+      });
+    }
+  });
+
+  socket.on('bye', function(){
+    console.log('received bye');
+  });
+
+});
