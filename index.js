@@ -3,6 +3,7 @@ const serve       = require('koa-static');
 const websockify  = require('koa-websocket');
 const cors        = require('kcors');
 const UUID        = require('uuid/v4');
+require('dotenv').config();
 
 const WEB_PORT = process.env.WEB_PORT || 8080;
 
