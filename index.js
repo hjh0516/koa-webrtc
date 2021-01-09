@@ -42,7 +42,7 @@ io.sockets.on('connection', function(socket) {
 
 		socketIds.forEach(socketId => {
 		//	if (socket.id===socketId) console.log('-------------------************');
-//			else socket.broadcast.emit('message', message);
+    //	else socket.broadcast.emit('message', message);
 			io.sockets.sockets[socketId].leave('foo');
 		});
 
