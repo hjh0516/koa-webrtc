@@ -14,7 +14,10 @@ const options = {
 };
 
 var fileServer = new(nodeStatic.Server)();
-let app = http.createServer(options, (req,res)=>{
+// let app = https.createServer(options, (req,res)=>{
+//   fileServer.serve(req, res);
+// }).listen(3030);
+let app = http.createServer((req,res)=>{
   fileServer.serve(req, res);
 }).listen(3030);
 
