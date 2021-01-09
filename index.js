@@ -14,12 +14,12 @@ const options = {
 };
 
 var fileServer = new(nodeStatic.Server)();
-// let app = https.createServer(options, (req,res)=>{
-//   fileServer.serve(req, res);
-// }).listen(3030);
-let app = http.createServer((req,res)=>{
+let app = https.createServer(options, (req,res)=>{
   fileServer.serve(req, res);
 }).listen(3030);
+// let app = http.createServer((req,res)=>{
+//   fileServer.serve(req, res);
+// }).listen(3030);
 
 console.log('Started chating server...');
 
