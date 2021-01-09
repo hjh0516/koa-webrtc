@@ -3,9 +3,9 @@ const serve       = require('koa-static');
 const websockify  = require('koa-websocket');
 const cors        = require('kcors');
 const UUID        = require('uuid/v4');
-// var fs = require('fs');
+var fs = require('fs');
 // var path = require('path');
-var http = require('http');
+// var http = require('http');
 var https = require('https');
 require('dotenv').config();
 
@@ -48,6 +48,15 @@ app.ws.use(async (ctx, next) => {
     }
 });
 
-app.listen(WEB_PORT, () => {
-    console.info(`Server listening on port ${WEB_PORT}`); 
-})
+
+
+const options = {
+   key: fs.readFileSync("key.pem"),
+   cert: fs.readFileSync("cert.pem")
+ };
+
+ https.createServer(options, app.callback()).listen(WEB_PORT);
+
+// app.listen(WEB_PORT, () => {
+//     console.info(`Server listening on port ${WEB_PORT}`); 
+// })
