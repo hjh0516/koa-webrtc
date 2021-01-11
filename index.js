@@ -13,6 +13,9 @@ const options = {
 let app = https.createServer(options, (req,res)=>{
   fileServer.serve(req, res);
 }).listen(3030);
+// let app = http.createServer((req,res)=>{
+//   fileServer.serve(req, res);
+// }).listen(3030);
 const io = require('socket.io')(app, {
   cors: {
     origin: '*',
@@ -60,10 +63,14 @@ io.of('/').on('connection', (socket) => {
   });
 
   socket.on('create or join', function(room) {
-    log('Received request to create or join room ' + room);
+    console.log('Received request to create or join room ' + room);
 
-    var clientsInRoom = io.sockets.adapter.rooms[room];
-    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+    
+    var clientsInRoom = socket.adapter.rooms.get(room);
+    console.log(clientsInRoom);
+    console.log(socket.adapter.rooms);
+    var numClients = clientsInRoom ? clientsInRoom.size : 0;
+    console.log(numClients);
     log('Room ' + room + ' now has ' + numClients + ' client(s)');
 
     if (numClients === 0) {
