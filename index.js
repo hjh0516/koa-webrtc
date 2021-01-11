@@ -3,8 +3,6 @@
 var os = require('os');
 var nodeStatic = require('node-static');
 var http = require('http');
-var socketIO = require('socket.io');
-
 const https = require('https');
 const fs = require('fs');
 
@@ -12,19 +10,27 @@ const options = {
   key: fs.readFileSync('./private.pem'),
   cert: fs.readFileSync('./public.pem')
 };
-
-var fileServer = new(nodeStatic.Server)();
 let app = https.createServer(options, (req,res)=>{
   fileServer.serve(req, res);
 }).listen(3030);
+const io = require('socket.io')(app, {
+  cors: {
+    origin: '*',
+  },
+});
+
+
+var fileServer = new(nodeStatic.Server)();
 // let app = http.createServer((req,res)=>{
 //   fileServer.serve(req, res);
 // }).listen(3030);
 
 console.log('Started chating server...');
 
-var io = socketIO.listen(app);
-io.sockets.on('connection', function(socket) {
+// var io = socketIO.listen(app);
+
+io.of('/').on('connection', (socket) => {
+// io.sockets.on('connection', function(socket) {
 
   // convenience function to log server messages on the client
   function log() {
