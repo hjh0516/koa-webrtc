@@ -1,15 +1,18 @@
-// const Koa = require('koa');
-// const app = new Koa();
+const Koa = require('koa');
+const app = new Koa();
 const https = require('https');
 const fs = require('fs');
+const socket = require("socket.io");
 const options = {
   key: fs.readFileSync('../ssl/privkey.pem'),
   cert: fs.readFileSync('../ssl/cert.pem')
 };
-let server = https.createServer(options, (req,res)=>{
-  fileServer.serve(req, res);
-});
-const socket = require("socket.io");
+let serverCallback = app.callback();
+var server = https.createServer(options, serverCallback);
+
+// let server = https.createServer(options, (req,res)=>{
+//   fileServer.serve(req, res);
+// });
 
 const io = socket(server, {
     cors: {
@@ -58,4 +61,8 @@ io.on('connection', socket => {
        //       credential: "98376683"
    //       }
     //   ] (편집됨) 
-server.listen(3030, () => console.log('server is running on port 3030'));
+// server.listen(3030, () => console.log('server is running on port 3030'));
+
+server.listen(3030, () => {
+    console.log('listening to port 3030');
+  });
