@@ -10,7 +10,13 @@ let server = https.createServer(options, (req,res)=>{
   fileServer.serve(req, res);
 });
 const socket = require("socket.io");
-const io = socket(server);
+
+const io = socket(server, {
+    cors: {
+      origin: '*',
+    },
+  });
+// const io = socket(server);
 const users = {};
 io.on('connection', socket => {
     if (!users[socket.id]) {
