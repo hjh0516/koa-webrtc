@@ -7,8 +7,8 @@ const https = require('https');
 const fs = require('fs');
 
 const options = {
-  key: fs.readFileSync('./privkey.pem'),
-  cert: fs.readFileSync('./cert.pem')
+  key: fs.readFileSync('../ssl/privkey.pem'),
+  cert: fs.readFileSync('../ssl/cert.pem')
 };
 let app = https.createServer(options, (req,res)=>{
   fileServer.serve(req, res);
