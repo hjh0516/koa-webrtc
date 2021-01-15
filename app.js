@@ -60,7 +60,7 @@ io.on('connection', socket => {
     send_users[rooms[room_no].first_socket_id] = rooms[room_no].first_socket_id;
     send_users[rooms[room_no].second_socket_id] = rooms[room_no].second_socket_id;
     if (rooms[room_no].second_socket_id)
-        io.to(rooms[room_no].first_socket_id).emit('connectedUsers', {user :send_users, type:'call'});
+        io.to(rooms[room_no].first_socket_id).emit('connectedUsers', rooms[room_no].second_socket_id);
     // if (rooms[room_no].first_socket_id)
     //     io.to(rooms[room_no].second_socket_id).emit('connectedUsers', {user :send_users, type:'accept'});
     // 최대 users는 2명이다. 의사와 환자
