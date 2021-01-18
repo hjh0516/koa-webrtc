@@ -86,6 +86,24 @@ io.on('connection', socket => {
         io.to(data.to).emit('callAccepted', data.signal);
     });
 
+    socket.on("callOff", (data) => {
+        if (rooms[room_no] != undefined){
+            console.log('disconnect one');
+            if (rooms[room_no].first_socket_id == data.from.id){
+                rooms[room_no].first_socket_id = null
+                io.to(rooms[room_no].second_socket_id).emit('connectedUsers', null);
+            }
+            if (rooms[room_no].second_socket_id == data.from.id){
+                rooms[room_no].second_socket_id = null
+                io.to(rooms[room_no].first_socket_id).emit('connectedUsers', null);
+            }
+
+            if (rooms[room_no].second_socket_id == null && rooms[room_no].first_socket_id == null)
+                delete rooms[room_no];
+        }
+        delete users[socket.id];
+    });
+
 });
 
 server.listen(3030, () => {
