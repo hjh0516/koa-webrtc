@@ -103,7 +103,6 @@ io.on('connection', socket => {
         }
         delete users[socket.id];
     });
-
 });
 
 server.listen(3030, () => {
