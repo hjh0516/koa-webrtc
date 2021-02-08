@@ -64,6 +64,7 @@ io.on('connection', socket => {
 
     if (rooms[room_no].second_socket_id){
         io.to(rooms[room_no].first_socket_id).emit('connectedUsers', rooms[room_no].second_socket_id);
+        io.to(rooms[room_no].second_socket_id).emit('connectedUsers', rooms[room_no].first_socket_id);
     }
     socket.on('disconnect', () => {
         setDomain(Config.database, true);
