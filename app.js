@@ -92,8 +92,9 @@ io.on('connection', socket => {
     });
 
     socket.on("acceptCall", (data) => {
-        console.log(data);
         io.to(data.to).emit('callAccepted', data.signal);
+        console.log('acceptCall');
+        console.log(data.to);
         if (users[data.to].type == 'user'){
             setDomain(Config.database, true);
             const room_no = users[data.to].room_no;
@@ -127,7 +128,6 @@ io.on('connection', socket => {
     });
 
     socket.on("callOff", (data) => {
-        console.log(data);
         if (rooms[room_no] != undefined){
             console.log('disconnect one');
             update_end(room_no);
