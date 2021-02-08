@@ -87,7 +87,9 @@ io.on('connection', socket => {
     });
 
     socket.on("callUser", (data) => {
-        console.log(data);
+        console.log( 'meet');
+        console.log( data.from);
+        console.log( data.userToCall);
         io.to(data.userToCall).emit('meet', {signal: data.signalData, from: data.from});
     });
 
