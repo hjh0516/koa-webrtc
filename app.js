@@ -62,25 +62,28 @@ io.on('connection', socket => {
     send_users[rooms[room_no].first_socket_id] = rooms[room_no].first_socket_id;
     send_users[rooms[room_no].second_socket_id] = rooms[room_no].second_socket_id;
 
-    if (rooms[room_no].second_socket_id)
+    if (rooms[room_no].second_socket_id){
         io.to(rooms[room_no].first_socket_id).emit('connectedUsers', rooms[room_no].second_socket_id);
-        socket.on('disconnect', () => {
-            setDomain(Config.database, true);
-            update_end(room_no);
-            if (rooms[room_no] != undefined){
-                console.log('disconnect one');
-                if (rooms[room_no].first_socket_id == socket.id){
-                    rooms[room_no].first_socket_id = null
-                }
-                if (rooms[room_no].second_socket_id == socket.id){
-                    rooms[room_no].second_socket_id = null
-                }
-
-                if (rooms[room_no].second_socket_id == null && rooms[room_no].first_socket_id == null)
-                    delete rooms[room_no];
+    }
+    socket.on('disconnect', () => {
+        setDomain(Config.database, true);
+        update_end(room_no);
+        if (rooms[room_no] != undefined){
+            console.log('disconnect one');
+            if (rooms[room_no].first_socket_id == socket.id){
+                rooms[room_no].first_socket_id = null
+                io.to(rooms[room_no].second_socket_id).emit('connectedUsers', null);
             }
-            delete users[socket.id];
-        });
+            if (rooms[room_no].second_socket_id == socket.id){
+                rooms[room_no].second_socket_id = null
+                io.to(rooms[room_no].first_socket_id).emit('connectedUsers', null);
+            }
+
+            if (rooms[room_no].second_socket_id == null && rooms[room_no].first_socket_id == null)
+                delete rooms[room_no];
+        }
+        delete users[socket.id];
+    });
 
     socket.on("callUser", (data) => {
         console.log(data);
