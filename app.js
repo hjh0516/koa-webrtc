@@ -62,7 +62,7 @@ io.on('connection', socket => {
     send_users[rooms[room_no].first_socket_id] = rooms[room_no].first_socket_id;
     send_users[rooms[room_no].second_socket_id] = rooms[room_no].second_socket_id;
 
-    if (rooms[room_no].second_socket_id){
+    if (rooms[room_no].second_socket_id && rooms[room_no].first_socket_id){
         io.to(rooms[room_no].first_socket_id).emit('connectedUsers', rooms[room_no].second_socket_id);
         io.to(rooms[room_no].second_socket_id).emit('connectedUsers', rooms[room_no].first_socket_id);
     }
