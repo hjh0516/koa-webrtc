@@ -27,15 +27,15 @@ io.on('connection', socket => {
     const type = socket.handshake.query.type;
     console.log('connected');
 
-    if (!users[socket.id]) {
-        users[socket.id] = {
-            socket_id : socket.id, 
-            room_no : room_no,
-            type : type
-        };
-    }
 
     if (!rooms[room_no]) {
+        if (!users[socket.id]) {
+            users[socket.id] = {
+                socket_id : socket.id, 
+                room_no : room_no,
+                type : type
+            };
+        }
         console.log('empty');
         rooms[room_no] = {
             first_socket_id : socket.id,
@@ -43,7 +43,14 @@ io.on('connection', socket => {
             second_socket_id : null,
             second_type : null
         };
-    }else{
+    }else if(rooms[room_no].second_socket_id){
+        if (!users[socket.id]) {
+            users[socket.id] = {
+                socket_id : socket.id, 
+                room_no : room_no,
+                type : type
+            };
+        }
         if (rooms[room_no].first_type == type){
             rooms[room_no].first_socket_id = socket.id;
             rooms[room_no].first_type = type;
@@ -51,6 +58,9 @@ io.on('connection', socket => {
             rooms[room_no].second_socket_id = socket.id;
             rooms[room_no].second_type = type;
         }
+    }else{
+        console.log('duplicate');
+        return
     }
     socket.join(room_no);
     console.log(rooms[room_no]);
