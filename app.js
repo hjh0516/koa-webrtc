@@ -43,7 +43,7 @@ io.on('connection', socket => {
             second_socket_id : null,
             second_type : null
         };
-    }else if(rooms[room_no].second_socket_id){
+    }else if(rooms[room_no].second_socket_id == null){
         if (!users[socket.id]) {
             users[socket.id] = {
                 socket_id : socket.id, 
