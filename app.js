@@ -59,6 +59,7 @@ io.on('connection', socket => {
             rooms[room_no].second_type = type;
         }
     }else{
+        socket.emit("proceeding", socket.id);
         console.log('duplicate');
         return
     }
