@@ -101,7 +101,7 @@ io.on('connection', socket => {
         console.log( 'meet');
         console.log( data.from);
         console.log( data.userToCall);
-        io.to(data.userToCall).emit('meet', {signal: data.signalData, from: data.from});
+        io.to(data.userToCall).emit('meet', {signal: data.signalData, from: data.from, to:data.userToCall});
     });
 
     socket.on("acceptCall", (data) => {
